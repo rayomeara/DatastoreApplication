@@ -2,7 +2,10 @@ package datastore_project.datastore;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
  
 import javax.servlet.RequestDispatcher;
@@ -19,6 +22,21 @@ public class ControllerServlet extends HttpServlet {
     public void init() {
         Connection connection = (Connection)getServletContext().getAttribute("connection");
     	dao = new DatastoreDAO(connection);
+    	try {
+	    	DatabaseMetaData dbm = connection.getMetaData();
+	        ResultSet rs = dbm.getTables(null, "PUBLIC", "PERSON", null);
+	        if (!rs.next()) {
+	        	Statement s = connection.createStatement();
+	        	String sql = "Create table Person (id int NOT NULL AUTO_INCREMENT, firstName varchar(50), lastName varchar(50), "
+	            		+ "PRIMARY KEY (id))";
+	            s.execute(sql);
+	            sql = "Create table Address (id int NOT NULL AUTO_INCREMENT, personId int, street varchar(50), city varchar(15), state varchar(15), postcode varchar(15), "
+	            		+ "PRIMARY KEY (id), FOREIGN KEY (personId) REFERENCES Person (id)  )";
+	            s.execute(sql);
+	        }else{
+	            System.out.println("already exists");
+	        }
+    	} catch (SQLException e) {e.printStackTrace();}
     }
  
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -192,4 +210,5 @@ public class ControllerServlet extends HttpServlet {
         response.sendRedirect("list");
  
     }
+
 }

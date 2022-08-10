@@ -10,7 +10,7 @@ import java.sql.Statement;
 public class App 
 {
 	public static void main(String[] args) throws SQLException {
-        String jdbcURL = "jdbc:h2:~/test";
+        String jdbcURL = "jdbc:h2:./main";
         String username = "sa";
         String password = "1234";
  
